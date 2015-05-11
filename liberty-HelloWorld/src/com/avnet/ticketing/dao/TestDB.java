@@ -1,9 +1,12 @@
+package com.avnet.ticketing.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -40,15 +43,27 @@ public class TestDB extends HttpServlet {
 		String VCAP_SERVICES = System.getenv("VCAP_SERVICES");
 	//	response.getWriter().write(JSON.parse(VCAP_SERVICES).toString());
 		try {
+			Map env = System.getenv();
+			  String vcap = (String) env.get("VCAP_SERVICES");
+			  System.out.println("hhi"+vcap);
+			  System.out.println("fdsfasd");
+			  
 		InitialContext ctx = new InitialContext();
 		javax.sql.DataSource ds = (javax.sql.DataSource) 
-		    ctx.lookup("java:comp/env/jdbc/mydbinstance");
+		    ctx.lookup("java:comp/env/jdbc/TicketingDatabase");
 			Connection conn = ds.getConnection();
 			Statement s = conn.createStatement();
 		
-			ResultSet rs = s.executeQuery("select * from "+"\"USER04138\""+".\"csv\"");
-			while(rs.next())
-				response.getWriter().write(rs.getString("name"));
+//			ResultSet rs = s.executeQuery("select * from "+"\"USER01130\""+".\"csv\"");
+//			while(rs.next())
+//				response.getWriter().write(rs.getString("name"));
+			 PreparedStatement updateemp = conn.prepareStatement
+				      ("insert into USER01125.T_AGENT(PK_AGENTID,EMAILID,FIRSTNAME,PASSW0RD) values(NEXT VALUE FOR  agentId,?,?,?)");
+			 
+				      updateemp.setString(1,"hemanthprabhu33@gmail.com");
+				      updateemp.setString(2,"hemanth");
+				      updateemp.setString(3, "test");
+				      updateemp.executeUpdate();
 		response.getWriter().flush();
 		} catch (SQLException e) {
 			e.printStackTrace();
