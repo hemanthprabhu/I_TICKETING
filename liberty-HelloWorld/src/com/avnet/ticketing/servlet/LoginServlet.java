@@ -69,6 +69,7 @@ public class LoginServlet extends HttpServlet {
 				HttpSession session=request.getSession();  
 		        session.setAttribute("userid",result.getUserid());
 		        session.setAttribute("role",result.getRole());
+		        session.setAttribute("username",result.getName());
 				
 			}
 			else
@@ -76,15 +77,16 @@ public class LoginServlet extends HttpServlet {
 				
 				HttpSession session=request.getSession();  
 		        session.setAttribute("loginFailure",true);
+		        response.sendRedirect("login.jsp");
 		     
-				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
-				responseMessage.setResponse("failure");
-				responseMessage.setMessage("Some internal problem occured");
-				Gson gson=new Gson();
-				String json = gson.toJson(responseMessage);
-
-				PrintWriter out = response.getWriter();
-				out.println(json);
+//				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
+//				responseMessage.setResponse("failure");
+//				responseMessage.setMessage("Some internal problem occured");
+//				Gson gson=new Gson();
+//				String json = gson.toJson(responseMessage);
+//
+//				PrintWriter out = response.getWriter();
+//				out.println(json);
 				
 			}
 			System.out.println("The result for login is "+result);

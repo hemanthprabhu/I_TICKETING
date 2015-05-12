@@ -1,6 +1,7 @@
 package com.avnet.ticketing.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.avnet.ticketing.DataBeans.Ticket;
 import com.avnet.ticketing.DataBeans.UserDetails;
@@ -14,5 +15,6 @@ public  UserDetails loginValidation(String username,String password,String role)
 public  List<UserDetails> getAllAgents();
 public boolean updateAgentInTickets(int agentid,List<Integer> ticketList);
 public Ticket getTicketAndComments(int ticketId);
+public Map getStatusCount();
 
 }

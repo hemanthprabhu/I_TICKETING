@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -48,13 +50,13 @@ public class Ticketing extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
-		
+		HttpSession session=request.getSession();
 		String action=request.getParameter("action");
 		switch(TicketingAction.valueOf(action))
 		{
 		case createTicket:
 		{
-			HttpSession session=request.getSession();  
+		  
 			int customerId=Integer.parseInt(session.getAttribute("userid").toString());
 			String subject=request.getParameter("subject");
 			String description=request.getParameter("description");
@@ -91,8 +93,8 @@ public class Ticketing extends HttpServlet {
 		{
 			int ticketId=Integer.parseInt(request.getParameter("ticketId"));
 			String comment=request.getParameter("comment");
-			int addedBy=Integer.parseInt(request.getParameter("addedBy"));
-			String role=request.getParameter("role");
+			int addedBy=Integer.parseInt(session.getAttribute("userid").toString());
+			String role=session.getAttribute("role").toString();
 			boolean result=TicketingServiceDelagate.addComment(ticketId, comment, addedBy, role);
 			if(result)
 			{
@@ -191,24 +193,52 @@ public class Ticketing extends HttpServlet {
 	
 			List<TicketDataTableBean> ticketlist=new ArrayList<TicketDataTableBean>(size);
 			
+			String role=session.getAttribute("role").toString();
+			System.out.println("role from session is "+role);
 			
-			for(int i=0;i<size;i++)
+			if(role.equalsIgnoreCase("customer"))
 			{
-				ticket=new TicketDataTableBean();
-				ticket.setTicketId(result.get(i).getTicketId());
-				ticket.setSubject(result.get(i).getSubject());
-				ticket.setStatus(result.get(i).getStatus());
-				ticket.setAgentname(result.get(i).getAgenetName());
-				ticket.setPriority(result.get(i).getPriority());
-				ticketlist.add(ticket);
-				
+				int customerid=Integer.parseInt(session.getAttribute("userid").toString());
+				System.out.println("User id from session is "+customerid);
+				for(int i=0;i<size;i++)
+				{
+					ticket=new TicketDataTableBean();
+					System.out.println("Userid from session is"+customerid+"userid from db is "+result.get(i).getCustomerId()+ " result :");
+					if(result.get(i).getCustomerId()==customerid)
+					{
+					ticket.setTicketId(result.get(i).getTicketId());
+					ticket.setSubject(result.get(i).getSubject());
+					ticket.setStatus(result.get(i).getStatus());
+					ticket.setAgentname(result.get(i).getAgenetName());
+					ticket.setPriority(result.get(i).getPriority());
+					ticketlist.add(ticket);
+					}
+					
+				}
 			}
+			else if(role.equalsIgnoreCase("agent"))
+			{
+				for(int i=0;i<size;i++)
+				{
+					ticket=new TicketDataTableBean();
+					
+					ticket.setTicketId(result.get(i).getTicketId());
+					ticket.setSubject(result.get(i).getSubject());
+					ticket.setStatus(result.get(i).getStatus());
+					ticket.setAgentname(result.get(i).getAgenetName());
+					ticket.setPriority(result.get(i).getPriority());
+					ticketlist.add(ticket);
+					
+				}
+			}
+			
 			TicketDataTableCount ticketlistResponse=new TicketDataTableCount();
 			ticketlistResponse.setRecordsFiltered(size);
 			ticketlistResponse.setListofTickets(ticketlist);
 			
 			DataTableBean bean=new DataTableBean();
-			bean.setDraw(1);
+			String draw=request.getParameter("draw");
+			bean.setDraw(Integer.parseInt(draw));
 			bean.setRecordsTotal(size);
 
 			bean.setRecordsFiltered(size);
@@ -241,6 +271,45 @@ size=result.size();
 				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
 				responseMessage.setResponse("success");
 				responseMessage.setMessage(agentList);
+				
+				String json = gson.toJson(responseMessage);
+
+				PrintWriter out = response.getWriter();
+				out.println(json);
+			}
+			else
+			{
+				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
+				responseMessage.setResponse("failure");
+				responseMessage.setMessage("Some internal problem occured");
+				
+				String json = gson.toJson(responseMessage);
+
+				PrintWriter out = response.getWriter();
+				out.println(json);
+				
+			}
+
+			System.out.println("The result for get allagents is "+result.toString());
+		}
+		break;
+		case getStatusAndCount:
+		{
+			
+			
+			
+			Map result=TicketingServiceDelagate.getStatusCount();
+		
+			Gson gson=new Gson();
+			String statusAndCountList = gson.toJson(result);
+			
+int size=0;
+size=result.size();
+			if(size!=0)
+			{
+				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
+				responseMessage.setResponse("success");
+				responseMessage.setMessage(statusAndCountList);
 				
 				String json = gson.toJson(responseMessage);
 
@@ -328,6 +397,7 @@ size=result.size();
 			Ticket result=TicketingServiceDelagate.getTicketAndComments(ticketId);
 			
 			
+		
 			Gson gson=new Gson();
 			String ticket = gson.toJson(result);
 int size=0;

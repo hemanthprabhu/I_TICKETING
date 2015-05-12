@@ -9,6 +9,7 @@ login,
 updateAgentInTickets,
 gettAllAgents,
 getTicketAndComments,
-logout
+logout,
+getStatusAndCount
 
 }

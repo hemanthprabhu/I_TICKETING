@@ -28,7 +28,7 @@
                                                                      
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">26</div>
+                                    <div class="huge" id="open">0</div>
                                     <div>Open </div>
                                 </div>
                             </div>
@@ -50,12 +50,12 @@
                                     <i class="fa fa-tasks fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">12</div>
-                                    <div>NEW</div>
+                                    <div class="huge"  id="pending">0</div>
+                                    <div>Pending</div>
                                 </div>
                             </div>
                         </div>
-                        <a href="${contextPathURL}/viewTickets/viewTickets.jsp?searchByStatus=NEW">
+                        <a href="${contextPathURL}/viewTickets/viewTickets.jsp?searchByStatus=PENDING">
                             <div class="panel-footer">
                                 <span class="pull-left">View Details</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -72,12 +72,12 @@
                                     <i class="fa fa-thumbs-o-up fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">124</div>
+                                    <div class="huge"  id="resolved">0</div>
                                     <div>Resolved</div>
                                 </div>
                             </div>
                         </div>
-                        <a href="${contextPathURL}/viewTickets/viewTickets.jsp?searchByStatus=resolved">
+                        <a href="${contextPathURL}/viewTickets/viewTickets.jsp?searchByStatus=RESOLVED">
                             <div class="panel-footer">
                                 <span class="pull-left">View Details</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -94,12 +94,12 @@
                                     <i class="fa fa-support fa-5x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">13</div>
+                                    <div class="huge"  id="closed">0</div>
                                     <div>Closed</div>
                                 </div>
                             </div>
                         </div>
-                        <a href="${contextPathURL}/viewTickets/viewTickets.jsp?searchByStatus=closed">
+                        <a href="${contextPathURL}/viewTickets/viewTickets.jsp?searchByStatus=CLOSED">
                             <div class="panel-footer">
                                 <span class="pull-left">View Details</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -135,6 +135,8 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="../plugins/dist/js/sb-admin-2.js"></script>
+    
+     <script src="dashboard.js"></script>
 
 </body>
 

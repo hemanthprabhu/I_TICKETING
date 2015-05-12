@@ -1,6 +1,7 @@
 package com.avnet.ticketing.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.avnet.ticketing.DataBeans.Ticket;
 import com.avnet.ticketing.DataBeans.UserDetails;
@@ -57,6 +58,12 @@ public class TicketingServiceImpl implements TicketingService{
 	public Ticket getTicketAndComments(int ticketId) {
 		Ticket tiket=TicketingDAODelegate.getTicketAndComments(ticketId);
 		return tiket;
+	}
+
+	@Override
+	public Map getStatusCount() {
+		// TODO Auto-generated method stub
+		return TicketingDAODelegate.getStatusCount();
 	}
 
 }

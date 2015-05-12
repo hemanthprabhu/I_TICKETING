@@ -1,6 +1,7 @@
 package com.avnet.ticketing.delegate;
 
 import java.util.List;
+import java.util.Map;
 
 import com.avnet.ticketing.DataBeans.Ticket;
 import com.avnet.ticketing.DataBeans.UserDetails;
@@ -41,7 +42,10 @@ public class TicketingServiceDelagate {
 	{
 		return service.getTicketAndComments(ticketId);
 	}
-
+	public static Map getStatusCount() 
+	{
+		return service.getStatusCount();
+	}
 
 }
  

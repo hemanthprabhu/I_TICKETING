@@ -25,18 +25,11 @@
 					    </div>
 					    <div class="commentBox">
 					        
-					        <p class="taskDescription">Problem Starting freerdp server</p>
+					        <p class="taskDescription" id="subject"></p>
 					    </div>
 					    <div class="actionBox">
 					        <ul id="commentList">
-					            <li>
-					                <div class="commentedDetails">
-					                  <span class="commentedBy">kamal</span>  <span class="commentedTime">commented on </span>
-					                </div>
-					                <div class="commentedText">
-					                    <p class="commented">Hello this is a test comment.</p> 
-					                </div>
-					            </li>
+					           
 					           
 					        </ul>
 					            <div class="form-group" style="width:100%">		

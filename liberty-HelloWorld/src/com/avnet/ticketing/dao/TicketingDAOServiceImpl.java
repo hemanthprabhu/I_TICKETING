@@ -7,7 +7,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -149,6 +151,7 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 				ticket.setStatus(rs.getString("STATUS"));
 				ticket.setPriority(rs.getString("PRIORITY"));
 				ticket.setTimestamp(rs.getTimestamp("CREATEDAT"));
+				ticket.setCustomerId(rs.getInt("FK_CUSTOMERID"));
 				ticketlist.add(ticket);
 			 }
 			rs.close();
@@ -357,7 +360,7 @@ System.out.println(e.toString());
 			conn = ds.getConnection();
 			
 			preparedStatement = conn
-					.prepareStatement("select * from T_COMMENTS where FK_TICKETID=?");
+					.prepareStatement("select comments.* ,case comments.role when 'customer' then  (select FIRSTNAME from T_CUSTOMER where PK_CUSTOMERID=comments.CREATEDBY) when 'agent' then  (select FIRSTNAME from T_AGENT where PK_AGENTID=comments.CREATEDBY)  End CREATERNAME   from T_COMMENTS as comments where comments.FK_TICKETID=?");
 			preparedStatement.setInt(1,ticketId);
 			 rs = preparedStatement.executeQuery();
 			 while(rs.next())
@@ -366,6 +369,7 @@ System.out.println(e.toString());
 				comment.setCommentText(rs.getString("COMMENTS"));
 				comment.setCreatedAt(rs.getTimestamp("CREATEDAT"));
 				comment.setRole(rs.getString("ROLE"));
+				comment.setCreatedBy(rs.getString("CREATERNAME"));
 				commentlist.add(comment);
 				
 				System.out.println("Comments "+comment+"  Comment list"+commentlist);
@@ -382,6 +386,38 @@ System.out.println(e.toString());
 		}
 		return commentlist;
 		
+	}
+
+	@Override
+	public Map getStatusCount() {
+		DataSource ds = DBUtil.getDataSource();
+		PreparedStatement preparedStatement = null;
+		Connection conn = null;
+		ResultSet rs =null;
+		
+		Map statusCountMap=new HashMap<String,String>();
+		try {
+			conn = ds.getConnection();
+			
+			preparedStatement = conn
+					.prepareStatement("select count(*) count,status from USER01125.T_TICKET group by status");
+			
+			 rs = preparedStatement.executeQuery();
+			 while(rs.next())
+			 {
+				 statusCountMap.put(rs.getString("status"),String.valueOf(rs.getInt("count")));
+			 
+			 }
+		
+			
+			rs.close();
+			conn.close();
+			preparedStatement.close();
+			
+			} catch (Exception e) {
+
+		}
+		return statusCountMap;
 	}
 
 }

@@ -14,10 +14,17 @@ public class Ticket implements Serializable {
 	private String subject;
 	private String description;
 	private String agenetName;
+	private int customerId;
 	private String priority;
 	private String status;
 	private Timestamp timestamp;
 	private List<Comment> comments;
+	public int getCustomerId() {
+		return customerId;
+	}
+	public void setCustomerId(int customerId) {
+		this.customerId = customerId;
+	}
 	public Timestamp getTimestamp() {
 		return timestamp;
 	}
@@ -76,10 +83,11 @@ public class Ticket implements Serializable {
 	public String toString() {
 		return "Ticket [ticketId=" + ticketId + ", customerName="
 				+ customerName + ", subject=" + subject + ", description="
-				+ description + ", agenetName=" + agenetName + ", priority="
-				+ priority + ", status=" + status + ", timestamp=" + timestamp
-				+ ", comments=" + comments + "]";
+				+ description + ", agenetName=" + agenetName + ", customerId="
+				+ customerId + ", priority=" + priority + ", status=" + status
+				+ ", timestamp=" + timestamp + ", comments=" + comments + "]";
 	}
+	
 	
 	
 
