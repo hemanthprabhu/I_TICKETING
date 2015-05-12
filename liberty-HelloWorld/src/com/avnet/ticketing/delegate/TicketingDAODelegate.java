@@ -17,9 +17,9 @@ public static boolean addComment(int ticketId,String comment,int addedBy,String 
 {
 	return daoService.addComment(ticketId, comment, addedBy, role);
 }
-public static boolean changeTicketStatus(int ticketId,String status)
+public static boolean changeTicketStatus(String status,List<Integer> ticketList)
 {
-	return daoService.changeTicketStatus(ticketId, status);
+	return daoService.changeTicketStatus(status,ticketList);
 }
 public static  List<Ticket> getTickets(String status)
 {

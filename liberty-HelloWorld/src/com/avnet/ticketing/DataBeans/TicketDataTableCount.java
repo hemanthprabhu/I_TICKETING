@@ -6,6 +6,7 @@ import java.util.List;
 public class TicketDataTableCount implements Serializable {
 	private List<TicketDataTableBean> listofTickets;
 	private int recordsFiltered;
+	
 	public List<TicketDataTableBean> getListofTickets() {
 		return listofTickets;
 	}

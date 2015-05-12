@@ -3,11 +3,13 @@ package com.avnet.ticketing.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.avnet.ticketing.DataBeans.UserDetails;
 import com.avnet.ticketing.constant.TicketingAction;
@@ -34,7 +36,7 @@ public class LoginServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		doPost(request,response);
 	}
 
 	/**
@@ -54,17 +56,27 @@ public class LoginServlet extends HttpServlet {
 			UserDetails result=TicketingServiceDelagate.loginValidation(username, password, role);
 			if(result.isValid())
 			{
-				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
-				responseMessage.setResponse("success");
-				responseMessage.setMessage("login successfully");
-				Gson gson=new Gson();
-				String json = gson.toJson(responseMessage);
+				if(result.getRole().equalsIgnoreCase("agent"))
+				{
 
-				PrintWriter out = response.getWriter();
-				out.println(json);
+					response.sendRedirect("dashboard/dashboard.jsp");
+				}
+				else if(result.getRole().equalsIgnoreCase("customer"))
+				{
+
+					response.sendRedirect("viewTickets/viewTickets.jsp");
+				}
+				HttpSession session=request.getSession();  
+		        session.setAttribute("userid",result.getUserid());
+		        session.setAttribute("role",result.getRole());
+				
 			}
 			else
 			{
+				
+				HttpSession session=request.getSession();  
+		        session.setAttribute("loginFailure",true);
+		     
 				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
 				responseMessage.setResponse("failure");
 				responseMessage.setMessage("Some internal problem occured");
@@ -78,6 +90,16 @@ public class LoginServlet extends HttpServlet {
 			System.out.println("The result for login is "+result);
 		}
 
+		break;
+		case logout:
+		{
+			
+		
+		HttpSession session=request.getSession();  
+		session.invalidate();
+		response.sendRedirect("login.jsp");
+     
+		}
 		break;
 		default:
 			JSONResponseBuilder responseMessage=new JSONResponseBuilder();

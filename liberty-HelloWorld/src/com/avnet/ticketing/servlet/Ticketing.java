@@ -10,11 +10,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.avnet.ticketing.DataBeans.DataTableBean;
 import com.avnet.ticketing.DataBeans.Ticket;
 import com.avnet.ticketing.DataBeans.TicketDataTableBean;
 import com.avnet.ticketing.DataBeans.TicketDataTableCount;
@@ -52,7 +54,8 @@ public class Ticketing extends HttpServlet {
 		{
 		case createTicket:
 		{
-			int customerId=Integer.parseInt(request.getParameter("customerId"));
+			HttpSession session=request.getSession();  
+			int customerId=Integer.parseInt(session.getAttribute("userid").toString());
 			String subject=request.getParameter("subject");
 			String description=request.getParameter("description");
 			String priority=request.getParameter("priority");
@@ -120,10 +123,28 @@ public class Ticketing extends HttpServlet {
 		break;
 		case changeStatus:
 		{
-			int ticketId=Integer.parseInt(request.getParameter("ticketId"));
-			String status=request.getParameter("status");
 			
-			boolean result=TicketingServiceDelagate.changeTicketStatus(ticketId, status);
+			String data=request.getParameter("Data");
+			String status="";
+			List<Integer> tokenList=new ArrayList<Integer>();
+			try {
+				JSONObject jsonObj = new JSONObject(data);
+				status=jsonObj.getString("statusId");
+				JSONArray ticketIdlist=jsonObj.getJSONArray("ticketIds");
+				System.out.println("agent id"+status);
+				for(int i=0;i<ticketIdlist.length();i++)
+				{
+					System.out.println("ticket id "+ticketIdlist.get(i));
+					String ticketId=String.valueOf(ticketIdlist.get(i));
+					tokenList.add(new Integer(ticketId));
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			boolean result=TicketingServiceDelagate.changeTicketStatus(status, tokenList);
 			if(result)
 			{
 				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
@@ -152,8 +173,14 @@ public class Ticketing extends HttpServlet {
 		break;
 		case getTickets:
 		{
+			String status=null;
 			
-			String status=request.getParameter("status");
+			
+			if (request.getParameter("status") != null) {
+				status = request.getParameter("status");
+
+			}
+					
 			
 			List<Ticket> result=TicketingServiceDelagate.getTickets(status);
 			TicketDataTableBean ticket=null;
@@ -179,33 +206,21 @@ public class Ticketing extends HttpServlet {
 			TicketDataTableCount ticketlistResponse=new TicketDataTableCount();
 			ticketlistResponse.setRecordsFiltered(size);
 			ticketlistResponse.setListofTickets(ticketlist);
+			
+			DataTableBean bean=new DataTableBean();
+			bean.setDraw(1);
+			bean.setRecordsTotal(size);
+
+			bean.setRecordsFiltered(size);
+			bean.setData(ticketlist);
 			Gson gson=new Gson();
-			String ticketlistResponsejson = gson.toJson(ticketlistResponse);
+			String ticketlistResponsejson = gson.toJson(bean);
 
-			if(size!=0)
-			{
-				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
-				responseMessage.setResponse("success");
-				responseMessage.setMessage(ticketlistResponsejson);
-				
-				String json = gson.toJson(responseMessage);
+			
 
 				PrintWriter out = response.getWriter();
-				out.println(json);
-			}
-			else
-			{
-				JSONResponseBuilder responseMessage=new JSONResponseBuilder();
-				responseMessage.setResponse("failure");
-				responseMessage.setMessage("Some internal problem occured");
-				
-				String json = gson.toJson(responseMessage);
-
-				PrintWriter out = response.getWriter();
-				out.println(json);
-				
-			}
-
+				out.println(ticketlistResponsejson);
+			
 			System.out.println("The result for getTickets is "+result.toString());
 		}
 		

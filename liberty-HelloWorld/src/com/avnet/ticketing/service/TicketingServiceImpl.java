@@ -23,8 +23,8 @@ public class TicketingServiceImpl implements TicketingService{
 	}
 
 	@Override
-	public boolean changeTicketStatus(int ticketId, String status) {
-		boolean flag=TicketingDAODelegate.changeTicketStatus(ticketId, status);
+	public boolean changeTicketStatus(String status,List<Integer> ticketList) {
+		boolean flag=TicketingDAODelegate.changeTicketStatus(status,ticketList);
 		return flag;
 	}
 

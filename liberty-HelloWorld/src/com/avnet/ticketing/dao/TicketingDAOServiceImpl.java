@@ -83,7 +83,7 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 	}
 
 	@Override
-	public boolean changeTicketStatus(int ticketId, String status) {
+	public boolean changeTicketStatus(String status,List<Integer> ticketList) {
 		
 		DataSource ds = DBUtil.getDataSource();
 		PreparedStatement preparedStatement = null;
@@ -91,13 +91,16 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 		int result = 0;
 		try {
 			conn = ds.getConnection();
+			for(Integer ticket : ticketList)
+			{
 			preparedStatement = conn
 					.prepareStatement("update USER01125.T_TICKET set STATUS=?  where PK_TICKETID=?");
 			
 			preparedStatement.setString(1, status);
-			preparedStatement.setInt(2, ticketId);
+			preparedStatement.setInt(2, ticket.intValue());
 			
 			result = preparedStatement.executeUpdate();
+			}
 			conn.close();
 			preparedStatement.close();
 			} catch (Exception e) {
@@ -121,7 +124,7 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 		
 		try {
 			conn = ds.getConnection();
-			if(status=="")
+			if(status==null)
 			{
 				preparedStatement = conn
 						.prepareStatement("select ticket.*,customer.FIRSTNAME as customername,agent.FIRSTNAME as agentname from USER01125.T_TICKET  as ticket join USER01125.T_CUSTOMER as customer on ticket.FK_CUSTOMERID=customer.PK_CUSTOMERID left join USER01125.T_AGENT as agent on ticket.FK_AGENTID=agent.PK_AGENTID");
@@ -136,6 +139,7 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 			 rs = preparedStatement.executeQuery();
 			 while(rs.next())
 			 {
+				 System.out.println("Entered in getTickets "+rs.getString("STATUS"));
 				ticket=new Ticket();
 				ticket.setAgenetName(rs.getString("agentname"));
 				ticket.setCustomerName(rs.getString("customername"));
@@ -151,6 +155,7 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 			conn.close();
 			preparedStatement.close();
 			} catch (Exception e) {
+				e.printStackTrace();
 
 		}
 		return ticketlist;
@@ -193,7 +198,7 @@ public class TicketingDAOServiceImpl implements TicketingDAOService {
 			{
 				System.out.println("inside agent section");
 			preparedStatement = conn
-					.prepareStatement("select * from USER01125.T_CUSTOMER where EMAILID=?");
+					.prepareStatement("select * from USER01125.T_AGENT where EMAILID=?");
 			
 			preparedStatement.setString(1,username);
 			 rs = preparedStatement.executeQuery();

@@ -8,7 +8,7 @@ import com.avnet.ticketing.DataBeans.UserDetails;
 public interface TicketingDAOService {
 public boolean createTicket(int customerId,String subject,String description,String priority);
 public boolean addComment(int ticketId,String comment,int addedBy,String role);
-public boolean changeTicketStatus(int ticketId,String status);
+public boolean changeTicketStatus(String status,List<Integer> ticketList);
 public List<Ticket> getTickets(String status);
 public  UserDetails loginValidation(String username,String password,String role);
 public  List<UserDetails> getAllAgents();

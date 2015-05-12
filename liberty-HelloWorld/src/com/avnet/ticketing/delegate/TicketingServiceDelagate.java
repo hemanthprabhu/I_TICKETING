@@ -17,9 +17,9 @@ public class TicketingServiceDelagate {
 	{
 		return service.addComment(ticketId, comment, addedBy, role);
 	}
-	public static boolean changeTicketStatus(int ticketId,String status)
+	public static boolean changeTicketStatus(String status,List<Integer> ticketList)
 	{
-		return service.changeTicketStatus(ticketId, status);
+		return service.changeTicketStatus(status,ticketList);
 	}
 	public static  List<Ticket> getTickets(String status)
 	{
