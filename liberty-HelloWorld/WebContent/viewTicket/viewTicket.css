@@ -1,0 +1,35 @@
+
+	.commentedDetails
+	{
+	background-color: #f1f1f1;
+	padding: 0.7%;
+	padding-left:1.5%;
+	}
+	.detailBox
+	{
+	width:80%;
+	margin:0 auto;
+	}
+	#commentList > li
+	{
+		list-style-type: none;
+		margin:10px 0px 10px 0px;
+	}
+	.commentedText
+	{	
+	  border-left:    1px solid #d1d1d1;
+	  border-right:  1px solid #d1d1d1;
+  	  border-bottom: 1px solid #d1d1d1;
+	}
+	.commentedBy
+	{
+	font-weight: bolder;
+	font-size: large;
+	}
+	.commented
+	{
+	padding:1%;
+	padding-left:3%;
+	text-indent: 20px;
+	word-wrap: break-word;
+	}
