@@ -1,18 +1,24 @@
 package com.avnet.ticketing.servlet;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,9 +35,21 @@ import com.avnet.ticketing.DataBeans.TicketDataTableCount;
 import com.avnet.ticketing.DataBeans.UserDetails;
 import com.avnet.ticketing.constant.TicketingAction;
 import com.avnet.ticketing.delegate.TicketingServiceDelagate;
+import com.avnet.ticketing.sendEmail.ConfigParams;
+import com.avnet.ticketing.sendEmail.SendGridService;
 import com.avnet.ticketing.util.JSONResponseBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.ibm.websphere.objectgrid.ClientClusterContext;
+import com.ibm.websphere.objectgrid.ObjectGrid;
+import com.ibm.websphere.objectgrid.ObjectGridManager;
+import com.ibm.websphere.objectgrid.ObjectGridManagerFactory;
+import com.ibm.websphere.objectgrid.ObjectMap;
+import com.ibm.websphere.objectgrid.Session;
+import com.ibm.websphere.objectgrid.security.config.ClientSecurityConfiguration;
+import com.ibm.websphere.objectgrid.security.config.ClientSecurityConfigurationFactory;
+import com.ibm.websphere.objectgrid.security.plugins.builtins.UserPasswordCredentialGenerator;
+import com.sendgrid.SendGridException;
 
 /**
  * Servlet implementation class CreateTicket
@@ -54,6 +72,98 @@ public class Ticketing extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
+		Session ogSession = null;
+ 		Map<String, String> env = System.getenv();
+ 		String vcap=env.get("VCAP_SERVICES");
+ 		
+ 		String username=null;
+ 		String password=null;
+ 		String endpoint=null;
+ 		String gridName=null;
+ 			
+        boolean foundService=false;
+        if(vcap==null) {
+        	System.out.println("No VCAP_SERVICES found");
+        } else {
+            try {
+            	JSONObject obj = new JSONObject(vcap);
+                String[] names=JSONObject.getNames(obj);
+                if (names!=null) {
+					for (String name:names) {
+                    	if (name.startsWith("DataCache")) {
+             				JSONArray val = obj.getJSONArray(name);
+             				JSONObject serviceAttr = val.getJSONObject(0);
+             				JSONObject credentials = serviceAttr.getJSONObject("credentials");
+             				username = credentials.getString("username");
+             				password = credentials.getString("password");             							  
+             				endpoint=credentials.getString("catalogEndPoint");
+             				gridName= credentials.getString("gridName");
+             				System.out.println("Found configured username: " + username);
+             				System.out.println("Found configured password: " + password);
+             				System.out.println("Found configured endpoint: " + endpoint);
+             				System.out.println("Found configured gridname: " + gridName);		
+             				foundService = true;
+             				break;
+             			}                                	                                 	                                 	                                         
+                    }
+				}
+			} catch(Exception e) {}
+ 		}
+        
+ 		if(!foundService) {
+   			System.out.println("Did not find WXS service, using defaults");
+ 		}
+ 		
+ 		try {
+ 			
+			ObjectGridManager ogm = ObjectGridManagerFactory
+					.getObjectGridManager();
+			ClientSecurityConfiguration csc=null;
+			csc=ClientSecurityConfigurationFactory.getClientSecurityConfiguration();
+			csc.setCredentialGenerator(new UserPasswordCredentialGenerator(username,password));
+			csc.setSecurityEnabled(true);
+			
+			ClientClusterContext ccc = ogm
+					.connect(endpoint, csc, null);
+	
+			ObjectGrid clientGrid = ogm.getObjectGrid(ccc, gridName);
+			ogSession = clientGrid.getSession();
+			
+ 		} catch(Exception e) {
+ 			System.out.println("Failed to connect to grid!");
+ 			e.printStackTrace();
+ 		}
+
+
+		try {
+			request.setCharacterEncoding("UTF-8");
+			response.setContentType("text/plain");
+			response.setCharacterEncoding("UTF-8");
+				
+			// Use the getMap() method to return a ObjectMap obejct.
+			// Once we have this object, we will be able to perform
+			// key-value operations on the map.
+			ObjectMap map=ogSession.getMap("sample.NONE.P");
+			
+		    String key = "userid";		
+			
+			Object retrievedValue;
+			  map.upsert(key,"sampledata");
+			  retrievedValue=map.get(key);
+			  System.out.println("Data cache data is "+retrievedValue.toString());
+			
+			  
+			
+			
+			  
+			  response.getWriter().write("[PUT]");
+			  
+			
+		} catch(Exception e) {
+			System.out.println("Failed to perform operation on map");
+			e.printStackTrace();
+		}
+ 
 
 		HttpSession session = request.getSession();
 		String action = request.getParameter("action");
@@ -128,7 +238,46 @@ public class Ticketing extends HttpServlet {
 				responseMessage.setMessage("Successfully comment added");
 				Gson gson = new Gson();
 				String json = gson.toJson(responseMessage);
+				HashMap<String, String> user=null;
+				try {
+					user = _getUser();
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				Date currentDate = new Date();
 
+				Timestamp currentTimestamp = new Timestamp(currentDate.getTime());
+				String msg="Comment has been added for the ticket "+ ticketId + " At "+currentTimestamp;
+				String userName = user.get("username");
+				String password1 = user.get("password");
+				ConfigParams params = new ConfigParams(session.getAttribute("emailId").toString(), "hemanth.prabhu@avnet.com","Comment Added",
+						msg, userName, password1);
+				params.set_bccTo("");
+				params.set_category("");
+				params.set_footerHtml("");
+				params.set_footerText("");
+				params.set_templateId("");		
+				params.set_openTrack(false);
+				params.set_clickTrack(false);
+				 
+				// Add an image file for attachment demo		
+				ServletContext servletContext = request.getSession().getServletContext();		
+				final String fileName = "bluemix.png";
+				final String relativeWebPath = "images" + File.separator + fileName;
+				final String filePath = servletContext.getRealPath(relativeWebPath);				
+				params.set_fileName(fileName);
+				params.set_filePath(filePath);
+				
+				// Collect the UUID and cookie sent from the browser 
+					try {
+						SendGridService.send(params);
+					} catch (SendGridException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				
+				
 				PrintWriter out = response.getWriter();
 				out.println(json);
 			} else {
@@ -432,6 +581,23 @@ public class Ticketing extends HttpServlet {
 
 		}
 
+	}
+	private static HashMap<String, String> _getUser() throws JSONException {
+		HashMap<String, String> user = new HashMap<String, String>();
+		user.put("username", "");
+		user.put("password", "");
+		final String VCAP_SERVICES = System.getenv("VCAP_SERVICES");
+		if (VCAP_SERVICES != null) {
+			JSONObject vcap = new JSONObject(VCAP_SERVICES);
+			JSONArray sendgrid = (JSONArray) vcap.get("sendgrid");
+			JSONObject json = sendgrid.getJSONObject(0);
+			JSONObject credentials = json.getJSONObject("credentials");
+			String username = credentials.getString("username");
+			String password = credentials.getString("password");
+			user.put("username", username);
+			user.put("password", password);
+		}		
+		return user;
 	}
 
 	/**

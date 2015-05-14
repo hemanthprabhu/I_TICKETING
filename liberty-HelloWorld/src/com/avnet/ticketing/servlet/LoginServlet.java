@@ -70,6 +70,7 @@ public class LoginServlet extends HttpServlet {
 		        session.setAttribute("userid",result.getUserid());
 		        session.setAttribute("role",result.getRole());
 		        session.setAttribute("username",result.getName());
+		        session.setAttribute("emailId",result.getEmailId());
 				
 			}
 			else
