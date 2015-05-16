@@ -35,10 +35,12 @@ $.ajax({
 		var subject=ticket.subject;
 		$("#subject").text(subject);
 		var comments=ticket.comments;
+		 text="";
 		for(i=0;i<comments.length;i++)
 			{
 			if(comments[i].role=="customer")
 				{
+				text=text+comments[i].commentText+"  ";
 			addComment("Customer "+comments[i].createdBy,comments[i].createdAt,comments[i].commentText);
 				}
 			else if(comments[i].role=="agent")
@@ -46,6 +48,12 @@ $.ajax({
 				addComment("Agent "+comments[i].createdBy,comments[i].createdAt,comments[i].commentText);
 				}
 			}
+		 var wordCount = text.replace( /[^\w ]/g, "" ).split( /\s+/ ).length;
+		 while(wordCount<=100)
+		 {
+			 text=text+" "+text;  
+			 wordCount = text.replace( /[^\w ]/g, "" ).split( /\s+/ ).length;
+		 }
 		
 	},
 	error : function(data) {
@@ -115,4 +123,43 @@ $(addCommentClick).click(function() {
 		});
 
 	});
+addTweeet=function(tweet,tweetedBy,tweetLink,imageLink)
+{
+var template='<li class="left clearfix">'
+    +'<span class="chat-img pull-left">'
+        +'<img src="'+imageLink+'" alt="User Avatar" class="img-circle" />'
+    +'</span>'
+    +'<div class="chat-body clearfix">'
+                     +'<div class="header">'
+                     +'<strong class="primary-font">' + tweetedBy +'</strong>'
+                     +'</div>'
+                     +'<p><a href='+tweetLink+'>'
+            +tweet+'</a></p>'
+    +'</div>'
++'</li>';
+$("#chat").append(template); 
+
+}
+
+ 
+$.ajax({
+	url :  siteContextPath+"/CloudantTwitterServlet",
+	type : 'GET',
+	 success : function(data) {
+
+		//var data=[{"body":"Ilayathalapathy Vijay after finishing the #Jilla shoot at Pollachi today. Make way for #Jilla He is Coming! http://t.co/wKy9aMMIoi","link":"https://pbs.twimg.com/profile_images/426374207954366464/p8pfrJaA_normal.jpeg"},{"body":"Birthday Wishes to Actor Vijay Sethupathi #HappyBirthdayVijaySethupathi","link":"https://pbs.twimg.com/profile_images/423894591935242240/EUe7gwFW_normal.jpeg"},{"body":"#Jilla - 3/5 Vijay plays 2 his strengths \u0026amp; is going back 2 his core mass audiences. His scenes \u0026amp; dialogues with @Mohanlal r awesome.","link":"https://pbs.twimg.com/profile_images/534947883582119937/LKzDPbU8_normal.jpeg"}]  
+ data=JSON.parse(data);
+		for(var i=0;i<data.length;i++)
+		{
+		console.log(data[i].body); 
+		addTweeet(data[i].body,data[i].preferredUsername,data[i].link,data[i].image);
+		}
+		
+	},
+	error : function(data) {
+		alert("error");
+	},
+
+});
+
 } );
