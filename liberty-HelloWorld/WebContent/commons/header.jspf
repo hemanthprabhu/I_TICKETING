@@ -294,7 +294,7 @@ currentUserName = '<%=username %>';
 <div style="margin:4%;"> <img src="${contextPathURL}/commons/images/icon.png"></img>
                   <span style="padding-left:5%;">
                   <c:if test="${sessionScope.username != null}">
-             Welcome     <%=username %>
+                  <%=username %>
                   </c:if></span> 
 
                         </div>

@@ -129,10 +129,8 @@
                 	                	
                 	                	
                 	                	
-                	                	
-                	                	<!--   view twitter -->
-                	                	
-                	                	       <!-- Page Content -->
+                	      
+
 
                 <!-- twitter  -->
                 
@@ -148,26 +146,17 @@
 
                             </ul>
                         </div>
-                <!-- twitter -->
+                <!-- /twitter -->
                 
             </div>
             <!-- /.container-fluid -->
         </div>
         <!-- /#page-wrapper -->
 
-    </div>
-    <!-- /#twitter -->
 
-   <script>
-
-//var data=JSON.parse(data);
+  
 
 
-</script>
-</body>
-
-</html>
-                	                	
                 	                	<!-- /twitter -->
                 	
             </div>

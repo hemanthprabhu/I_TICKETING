@@ -127,7 +127,9 @@ addTweeet=function(tweet,tweetedBy,tweetLink,imageLink)
 {
 var template='<li class="left clearfix">'
     +'<span class="chat-img pull-left">'
-        +'<img src="'+imageLink+'" alt="User Avatar" class="img-circle" />'
+    +'<object data="'+imageLink+'" type="image/png">'
+    +'<img src="'+siteContextPath+'/commons/images/icon.png"  alt="User" class="img-circle"  />'
+   +'</object>'
     +'</span>'
     +'<div class="chat-body clearfix">'
                      +'<div class="header">'
@@ -141,19 +143,24 @@ $("#chat").append(template);
 
 }
 
- 
 $.ajax({
 	url :  siteContextPath+"/CloudantTwitterServlet",
 	type : 'GET',
+	 data: {
+		 action:"getAllTweetsFromCloudant",
+		 },  
 	 success : function(data) {
 
-		//var data=[{"body":"Ilayathalapathy Vijay after finishing the #Jilla shoot at Pollachi today. Make way for #Jilla He is Coming! http://t.co/wKy9aMMIoi","link":"https://pbs.twimg.com/profile_images/426374207954366464/p8pfrJaA_normal.jpeg"},{"body":"Birthday Wishes to Actor Vijay Sethupathi #HappyBirthdayVijaySethupathi","link":"https://pbs.twimg.com/profile_images/423894591935242240/EUe7gwFW_normal.jpeg"},{"body":"#Jilla - 3/5 Vijay plays 2 his strengths \u0026amp; is going back 2 his core mass audiences. His scenes \u0026amp; dialogues with @Mohanlal r awesome.","link":"https://pbs.twimg.com/profile_images/534947883582119937/LKzDPbU8_normal.jpeg"}]  
- data=JSON.parse(data);
+		 
+		var data=JSON.parse(data);
+
 		for(var i=0;i<data.length;i++)
 		{
 		console.log(data[i].body); 
 		addTweeet(data[i].body,data[i].preferredUsername,data[i].link,data[i].image);
+	//	addTweeet(data[i].body,"aaa",data[i].link,"ddd");
 		}
+
 		
 	},
 	error : function(data) {
@@ -161,5 +168,11 @@ $.ajax({
 	},
 
 });
+
+
+
+
+ 
+
 
 } );

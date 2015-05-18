@@ -10,6 +10,7 @@ updateAgentInTickets,
 gettAllAgents,
 getTicketAndComments,
 logout,
-getStatusAndCount
-
+getStatusAndCount,
+getTweetsAndPushInCloudant,
+getAllTweetsFromCloudant
 }

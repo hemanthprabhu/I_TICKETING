@@ -74,40 +74,40 @@ public class Ticketing extends HttpServlet {
 			String priority = request.getParameter("priority");
 			String urlString="https://api.eu.apim.ibmcloud.com/hemanthprabhu33gmailcom-examples/sb/ticketingService/CreateTicket?customerId="+customerId+"&subject="+subject+"&description="+description+"&priority="+priority+"&client_id=df38c6ed-e651-4638-80b7-82a3aad5ba25";
 			System.out.println("URL construction "+urlString);
-//			URL url = new URL(urlString);
-//			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//			conn.setRequestMethod("GET");
-//			conn.setRequestProperty("Accept", "application/json");
-//
-//			if (conn.getResponseCode() != 200) {
-//				throw new RuntimeException("Failed : HTTP error code : "
-//						+ conn.getResponseCode());
-//			}
-			boolean result = false;
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(
-//					(conn.getInputStream())));
-//			String line;
-//			while ((line = reader.readLine()) != null) {
-//				if (line.equalsIgnoreCase("success")) {
-//					System.out.println("Line is " + line);
-//					result = true;
-//					break;
-//				}
-//			}
-			 BufferedReader in = new BufferedReader(
-		    	        new InputStreamReader(new URL(urlString).openStream()));
+			URL url = new URL(urlString);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", "application/json");
 
-		    	        String inputLine;
-		    	        while ((inputLine = in.readLine()) != null)
-		    	        {
-		    	            System.out.println(inputLine);
-		    	            if (inputLine.equalsIgnoreCase("success")) {
-		    					System.out.println("Line is " + inputLine);
-		    					result = true;
-		    					break;
-		    				}
-		    	        }
-		    	        in.close();
+			if (conn.getResponseCode() != 200) {
+				throw new RuntimeException("Failed : HTTP error code : "
+						+ conn.getResponseCode());
+			}
+			boolean result = false;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					(conn.getInputStream())));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.equalsIgnoreCase("success")) {
+					System.out.println("Line is " + line);
+					result = true;
+					break;
+				}
+			}
+//			 BufferedReader in = new BufferedReader(
+//		    	        new InputStreamReader(new URL(urlString).openStream()));
+//
+//		    	        String inputLine;
+//		    	        while ((inputLine = in.readLine()) != null)
+//		    	        {
+//		    	            System.out.println(inputLine);
+//		    	            if (inputLine.equalsIgnoreCase("success")) {
+//		    					System.out.println("Line is " + inputLine);
+//		    					result = true;
+//		    					break;
+//		    				}
+//		    	        }
+//		    	        in.close();
 
 			// =TicketingServiceDelagate.createTicket(customerId, subject,
 			// description, priority);

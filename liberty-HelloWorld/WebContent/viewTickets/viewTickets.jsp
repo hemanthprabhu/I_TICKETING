@@ -13,8 +13,10 @@
                 <!-- /.row -->
                  <!-- view ticket info -->
                  
-                 
-                  <div class="btn-group pull-right">
+                 <c:if test="${sessionScope.role != null}">
+							<c:if test="${sessionScope.role == 'agent'}">
+							
+							 <div class="btn-group pull-right">
                                     <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                                         Actions
                                         <span class="caret"></span>
@@ -25,7 +27,12 @@
                                           <li><a href="#" id="updateStatus">Update Status </a>
                                         </li>                                      
                                     </ul>
-                    </div>
+                   			 </div>
+                 
+							</c:if>
+						</c:if>
+
+                 
                  
           <div class="table-responsive"  style="margin-top:30px">
                  
